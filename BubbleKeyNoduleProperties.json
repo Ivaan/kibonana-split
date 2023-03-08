@@ -1,0 +1,28 @@
+{
+    "SphereRadius":20,
+    "PlateTopAtRadius":9,
+    "PlateThickness":4,
+    "SphereThicknes":3,
+    "BackCoverCutAtRadius":0,
+    "SwitchHoleLength":14,
+    "SwitchHoleWidth":14,
+    "SwitchLatchWidth":4,
+    "SwitchLatchGrabThickness":1.5,
+    "SwitchFlatzoneLength":16,
+    "SwitchFlatzoneWidth":16,
+    "KeycapLength":18.6,
+    "KeycapWidth":18.5,
+    "KeycapBottomHeightAbovePlateDown":3,
+    "KeycapHeight":13,
+    "KeycapBottomHeightAbovePlateUp":6.4,
+    "KeycapClearanced":2.5,
+    "KeycapRound":1.2,
+    "HuggingCylinderRound":0.6,
+    "LaneWidth":19,
+    "InsertLength":8.4,         // + 0.4 per memory (and mostly a guess)
+    "InsertDiameter":3.3,       // + 0.4 per experiment 62f4f30
+    "InsertWallThickness":2.3,  // + 0.3 per experiment 62f4f30
+    "ScrewThreadDiameter":2.4,  // + 0.4 per experiment 62f4f30
+    "ScrewThreadLength":12,
+    "ScrewHeadDiameter":4.2     // + 0.4 per experiment 62f4f30,
+}

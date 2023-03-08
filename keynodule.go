@@ -18,75 +18,75 @@ func (kn KeyNodule) GetHitBoxes() []sdf.SDF3 {
 }
 
 type BubbleKeyNoduleProperties struct {
-	sphereRadius                     float64
-	plateTopAtRadius                 float64
-	plateThickness                   float64
-	sphereThicknes                   float64
-	backCoverCutAtRadius             float64
-	switchHoleLength                 float64
-	switchHoleWidth                  float64
-	switchLatchWidth                 float64
-	switchLatchGrabThickness         float64
-	switchFlatzoneLength             float64
-	switchFlatzoneWidth              float64
-	keycapLength                     float64
-	keycapWidth                      float64
-	keycapBottomHeightAbovePlateDown float64
-	keycapHeight                     float64
-	keycapBottomHeightAbovePlateUp   float64
-	keycapClearanced                 float64
-	keycapRound                      float64
-	huggingCylinderRound             float64
-	laneWidth                        float64 //as in "Stay in your lane" this restricts the holes to a max width
-	insertLength                     float64
-	insertDiameter                   float64
-	insertWallThickness              float64
-	screwThreadDiameter              float64
-	screwThreadLength                float64
-	screwHeadDiameter                float64
+	SphereRadius                     float64
+	PlateTopAtRadius                 float64
+	PlateThickness                   float64
+	SphereThicknes                   float64
+	BackCoverCutAtRadius             float64
+	SwitchHoleLength                 float64
+	SwitchHoleWidth                  float64
+	SwitchLatchWidth                 float64
+	SwitchLatchGrabThickness         float64
+	SwitchFlatzoneLength             float64
+	SwitchFlatzoneWidth              float64
+	KeycapLength                     float64
+	KeycapWidth                      float64
+	KeycapBottomHeightAbovePlateDown float64
+	KeycapHeight                     float64
+	KeycapBottomHeightAbovePlateUp   float64
+	KeycapClearanced                 float64
+	KeycapRound                      float64
+	HuggingCylinderRound             float64
+	LaneWidth                        float64 //as in "Stay in your lane" this restricts the holes to a max width
+	InsertLength                     float64
+	InsertDiameter                   float64
+	InsertWallThickness              float64
+	ScrewThreadDiameter              float64
+	ScrewThreadLength                float64
+	ScrewHeadDiameter                float64
 }
 
 func (knp BubbleKeyNoduleProperties) MakeBubbleKey(screwPossitionsBits int64) KeyNodule {
-	sphereCenterZ := -knp.plateTopAtRadius - knp.keycapBottomHeightAbovePlateUp
-	topOfPlateZ := -knp.keycapBottomHeightAbovePlateUp
-	bottomOfPlateZ := topOfPlateZ - knp.plateThickness
-	radiusAtTopOfPlate := math.Sqrt(knp.sphereRadius*knp.sphereRadius - knp.plateTopAtRadius*knp.plateTopAtRadius)
-	backCoverCutZ := sphereCenterZ + knp.backCoverCutAtRadius
-	keycapBottomWhenDownZ := topOfPlateZ + knp.keycapBottomHeightAbovePlateDown
-	screwRadiusFromCenter := radiusAtTopOfPlate - (knp.insertDiameter/2 + knp.insertWallThickness)
+	sphereCenterZ := -knp.PlateTopAtRadius - knp.KeycapBottomHeightAbovePlateUp
+	topOfPlateZ := -knp.KeycapBottomHeightAbovePlateUp
+	bottomOfPlateZ := topOfPlateZ - knp.PlateThickness
+	radiusAtTopOfPlate := math.Sqrt(knp.SphereRadius*knp.SphereRadius - knp.PlateTopAtRadius*knp.PlateTopAtRadius)
+	backCoverCutZ := sphereCenterZ + knp.BackCoverCutAtRadius
+	keycapBottomWhenDownZ := topOfPlateZ + knp.KeycapBottomHeightAbovePlateDown
+	screwRadiusFromCenter := radiusAtTopOfPlate - (knp.InsertDiameter/2 + knp.InsertWallThickness)
 
 	//solidSphere is the main outer shell
-	solidSphere, err := Sphere3DAtHeight(knp.sphereRadius, sphereCenterZ)
+	solidSphere, err := Sphere3DAtHeight(knp.SphereRadius, sphereCenterZ)
 	if err != nil {
 		panic(err)
 	}
 
 	//huggingCylinder sits on top of the plate, forms the case around the keycaps
-	huggingCylinder, err := sdf.Cylinder3D((knp.keycapHeight+knp.keycapBottomHeightAbovePlateDown)/2+knp.huggingCylinderRound, radiusAtTopOfPlate, knp.huggingCylinderRound)
+	huggingCylinder, err := sdf.Cylinder3D((knp.KeycapHeight+knp.KeycapBottomHeightAbovePlateDown)/2+knp.HuggingCylinderRound, radiusAtTopOfPlate, knp.HuggingCylinderRound)
 	if err != nil {
 		panic(err)
 	}
-	huggingCylinder = sdf.Transform3D(huggingCylinder, sdf.Translate3d(sdf.V3{Z: ((knp.keycapHeight+knp.keycapBottomHeightAbovePlateDown)/2+knp.huggingCylinderRound)/2 - knp.huggingCylinderRound - knp.keycapBottomHeightAbovePlateUp}))
+	huggingCylinder = sdf.Transform3D(huggingCylinder, sdf.Translate3d(sdf.V3{Z: ((knp.KeycapHeight+knp.KeycapBottomHeightAbovePlateDown)/2+knp.HuggingCylinderRound)/2 - knp.HuggingCylinderRound - knp.KeycapBottomHeightAbovePlateUp}))
 
 	//hollow subtracts from the solidSphere up to the bottom of the plate
-	hollow, err := Sphere3DAtHeight(knp.sphereRadius-knp.sphereThicknes, sphereCenterZ)
+	hollow, err := Sphere3DAtHeight(knp.SphereRadius-knp.SphereThicknes, sphereCenterZ)
 	if err != nil {
 		panic(err)
 	}
 	hollow = sdf.Cut3D(hollow, sdf.V3{X: 0, Y: 0, Z: bottomOfPlateZ}, sdf.V3{X: 0, Y: 0, Z: -1})
 
 	//Clearing cylinders are to remove artifacts from only nodules partially subtracted
-	topClearingCylinder, err := Cylinder3DBelow(knp.sphereRadius*2, knp.sphereRadius-knp.sphereThicknes, 0, backCoverCutZ)
+	topClearingCylinder, err := Cylinder3DBelow(knp.SphereRadius*2, knp.SphereRadius-knp.SphereThicknes, 0, backCoverCutZ)
 	if err != nil {
 		panic(err)
 	}
-	bottomClearingCylinder, err := Cylinder3DAbove(knp.sphereRadius*2, knp.sphereRadius-knp.sphereThicknes, 0, backCoverCutZ)
+	bottomClearingCylinder, err := Cylinder3DAbove(knp.SphereRadius*2, knp.SphereRadius-knp.SphereThicknes, 0, backCoverCutZ)
 	if err != nil {
 		panic(err)
 	}
 
 	//Hole through the plate for the switch
-	switchHole, err := Box3DBelow(sdf.V3{X: knp.switchHoleWidth, Y: knp.switchHoleLength, Z: knp.plateThickness}, 0, topOfPlateZ)
+	switchHole, err := Box3DBelow(sdf.V3{X: knp.SwitchHoleWidth, Y: knp.SwitchHoleLength, Z: knp.PlateThickness}, 0, topOfPlateZ)
 	if err != nil {
 		panic(err)
 	}
@@ -94,18 +94,18 @@ func (knp BubbleKeyNoduleProperties) MakeBubbleKey(screwPossitionsBits int64) Ke
 	//todo: add latch reliefs
 
 	//switchFlatzone is the area on the top of the plate reserved for the switch foot print
-	switchFlatzone, err := Box3DAbove(sdf.V3{X: knp.switchFlatzoneWidth, Y: knp.switchFlatzoneLength, Z: knp.keycapBottomHeightAbovePlateDown}, 0, topOfPlateZ)
+	switchFlatzone, err := Box3DAbove(sdf.V3{X: knp.SwitchFlatzoneWidth, Y: knp.SwitchFlatzoneLength, Z: knp.KeycapBottomHeightAbovePlateDown}, 0, topOfPlateZ)
 	if err != nil {
 		panic(err)
 	}
 
-	keyCapClearanceShadow := sdf.Box2D(sdf.V2{X: knp.keycapWidth + knp.keycapClearanced, Y: knp.keycapLength + knp.keycapClearanced}, knp.keycapRound+knp.keycapClearanced)
-	keyCapClearance, err := ExtrudeRounded3DAbove(keyCapClearanceShadow, knp.keycapHeight*2, 0, keycapBottomWhenDownZ)
+	keyCapClearanceShadow := sdf.Box2D(sdf.V2{X: knp.KeycapWidth + knp.KeycapClearanced, Y: knp.KeycapLength + knp.KeycapClearanced}, knp.KeycapRound+knp.KeycapClearanced)
+	keyCapClearance, err := ExtrudeRounded3DAbove(keyCapClearanceShadow, knp.KeycapHeight*2, 0, keycapBottomWhenDownZ)
 	if err != nil {
 		panic(err)
 	}
 
-	lane, err := Box3DAndTranslate(sdf.V3{X: knp.laneWidth, Y: knp.sphereRadius * 2, Z: knp.sphereRadius * 2}, 0, sdf.V3{Z: sphereCenterZ})
+	lane, err := Box3DAndTranslate(sdf.V3{X: knp.LaneWidth, Y: knp.SphereRadius * 2, Z: knp.SphereRadius * 2}, 0, sdf.V3{Z: sphereCenterZ})
 	if err != nil {
 		panic(err)
 	}
@@ -132,11 +132,11 @@ func (knp BubbleKeyNoduleProperties) MakeBubbleKey(screwPossitionsBits int64) Ke
 		angle := float64(i) * sdf.Tau / float64(numberOfScrews)
 		rotateIntoPlace := sdf.RotateZ(angle).Mul(sdf.Translate3d(sdf.V3{X: screwRadiusFromCenter}))
 
-		holder, err := Cylinder3DAbove(knp.insertLength+knp.insertWallThickness, knp.insertDiameter/2+knp.insertWallThickness, 0, backCoverCutZ)
+		holder, err := Cylinder3DAbove(knp.InsertLength+knp.InsertWallThickness, knp.InsertDiameter/2+knp.InsertWallThickness, 0, backCoverCutZ)
 		if err != nil {
 			panic(err)
 		}
-		holderHole, err := Cylinder3DAbove(knp.insertLength, knp.insertDiameter/2, 0, backCoverCutZ)
+		holderHole, err := Cylinder3DAbove(knp.InsertLength, knp.InsertDiameter/2, 0, backCoverCutZ)
 		if err != nil {
 			panic(err)
 		}
@@ -145,15 +145,15 @@ func (knp BubbleKeyNoduleProperties) MakeBubbleKey(screwPossitionsBits int64) Ke
 		insertHolders[i] = holder
 		insertHoldersHoles[i] = holderHole
 
-		screwChannel, err := Cylinder3DBelow(knp.sphereRadius, knp.screwHeadDiameter/2+knp.insertWallThickness, 0, backCoverCutZ)
+		screwChannel, err := Cylinder3DBelow(knp.SphereRadius, knp.ScrewHeadDiameter/2+knp.InsertWallThickness, 0, backCoverCutZ)
 		if err != nil {
 			panic(err)
 		}
-		screwThreadHole, err := Cylinder3DBelow(knp.screwThreadLength-knp.insertLength, knp.screwThreadDiameter/2, 0, backCoverCutZ)
+		screwThreadHole, err := Cylinder3DBelow(knp.ScrewThreadLength-knp.InsertLength, knp.ScrewThreadDiameter/2, 0, backCoverCutZ)
 		if err != nil {
 			panic(err)
 		}
-		screwHeadHole, err := Cylinder3DBelow(knp.sphereRadius, knp.screwHeadDiameter/2, 0, backCoverCutZ-(knp.screwThreadLength-knp.insertLength))
+		screwHeadHole, err := Cylinder3DBelow(knp.SphereRadius, knp.ScrewHeadDiameter/2, 0, backCoverCutZ-(knp.ScrewThreadLength-knp.InsertLength))
 		if err != nil {
 			panic(err)
 		}

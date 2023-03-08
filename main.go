@@ -1,40 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
-	"github.com/deadsy/sdfx/render"
+	"github.com/titanous/json5"
+
 	"github.com/deadsy/sdfx/sdf"
 )
 
 func main() {
-	knp := BubbleKeyNoduleProperties{
-		sphereRadius:                     20.0,
-		plateTopAtRadius:                 9,
-		plateThickness:                   4,
-		sphereThicknes:                   3,
-		backCoverCutAtRadius:             0,
-		switchHoleLength:                 14,
-		switchHoleWidth:                  14,
-		switchLatchWidth:                 4,
-		switchLatchGrabThickness:         1.5,
-		switchFlatzoneLength:             16,
-		switchFlatzoneWidth:              16,
-		keycapWidth:                      18.5,
-		keycapLength:                     18.6,
-		keycapBottomHeightAbovePlateDown: 3,
-		keycapHeight:                     13,
-		keycapBottomHeightAbovePlateUp:   6.4,
-		keycapClearanced:                 2.5,
-		keycapRound:                      1.2,
-		huggingCylinderRound:             0.6,
-		laneWidth:                        19,
-		insertLength:                     8.0 + 0.4, // per memory (and mostly a guess)
-		insertDiameter:                   2.9 + 0.4, // 0.4 per experiment 62f4f30
-		insertWallThickness:              2.0 + 0.3, // 0.3 per experiment 62f4f30
-		screwThreadDiameter:              2.0 + 0.4, // 0.4 per experiment 62f4f30
-		screwThreadLength:                12.0,
-		screwHeadDiameter:                3.8 + 0.4, // 0.4 per experiment 62f4f30,
+	var knp BubbleKeyNoduleProperties
+	knpBytes, err := os.ReadFile("BubbleKeyNoduleProperties.json")
+	if err != nil {
+		panic(err)
+	}
+
+	err = json5.Unmarshal(knpBytes, &knp)
+	if err != nil {
+		panic(err)
 	}
 
 	cols := []NoduleSource{
@@ -234,8 +219,8 @@ func main() {
 
 	// render.RenderSTL(top, 350, "3x5plus2top.stl")
 	// render.RenderSTL(back, 300, "3x5plus2back.stl")
-	render.RenderSTL(top, 1100, "3x5plus2top.stl")
-	render.RenderSTL(back, 1000, "3x5plus2back.stl")
+	//render.RenderSTL(top, 300, "3x5plus2top.stl")
+	//render.RenderSTL(back, 300, "3x5plus2back.stl")
 
 	//testing RowCones
 	// row := ConeRow{
