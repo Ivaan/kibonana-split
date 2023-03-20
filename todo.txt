@@ -1,0 +1,13 @@
+[x] - move Nodule properties to be read from a json file
+[ ] - move keyboard properties to be read from a json file
+	[ ] - this means solving the polymorphism problem
+[ ] - fix thumb cluster location
+	[ ] - probably just move it up (y) a full key width
+[ ] - fix pinkey column position
+	[ ] - down and in question mark
+[ ] - add a relief to thermal inserts so they stay put before applying heat
+[ ] - add switch latch hole
+[ ] - add mpu nodule
+[ ] - add usb nodule
+[ ] - add trrs nodule
+[ ] - try angling the interface between tops and bottoms so the fit/finish looks better
