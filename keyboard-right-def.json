@@ -1,0 +1,75 @@
+{
+    "BubbleKeyNodulePropertiesFile": "BubbleKeyNoduleProperties.json",
+    "FingerColumns": [
+        {
+            "Offset": {"X": -19.1, "Y": 0, "Z": 0 },
+            "SplayAngle": 0,
+            "ConvexAngle": 0,
+            "NumberOfKeys": 3,
+            "StartAngle": -20,
+            "StartRadius": 60,
+            "EndAngle": 75,
+            "EndRadius": 85,
+            "KeySpacing": 19.4,
+            "ColumnType": 0
+        },
+        {
+            "Offset": {"X": 0, "Y": 0, "Z": 0 },
+            "SplayAngle": 0,
+            "ConvexAngle": 0,
+            "NumberOfKeys": 3,
+            "StartAngle": -20,
+            "StartRadius": 60,
+            "EndAngle": 75,
+            "EndRadius": 85,
+            "KeySpacing": 19.4,
+            "ColumnType": 1
+        },
+        {
+            "Offset": {"X": 23, "Y": 0, "Z": 0 },
+            "SplayAngle": 5,
+            "ConvexAngle": 0.5,
+            "NumberOfKeys": 3,
+            "StartAngle": -20,
+            "StartRadius": 65,
+            "EndAngle": 75,
+            "EndRadius": 95,
+            "KeySpacing": 19.4,
+            "ColumnType": 1
+        },
+        {
+            "Offset": {"X": 47, "Y": 0, "Z": 0 },
+            "SplayAngle": 10,
+            "ConvexAngle": 1,
+            "NumberOfKeys": 3,
+            "StartAngle": -20,
+            "StartRadius": 62.5,
+            "EndAngle": 75,
+            "EndRadius": 90,
+            "KeySpacing": 19.4,
+            "ColumnType": 1
+        },
+        {
+            "Offset": {"X": 77, "Y": -4, "Z": 0 },
+            "SplayAngle": 25,
+            "ConvexAngle": 3,
+            "NumberOfKeys": 3,
+            "StartAngle": -20,
+            "StartRadius": 55,
+            "EndAngle": 75,
+            "EndRadius": 70,
+            "KeySpacing": 19.4,
+            "ColumnType": 1
+        }
+    ],
+    "ThumbRows": [
+        {
+            "OffsetToPoint": {"X": -20, "Y": -132, "Z": -24},
+            "CenterLine": {"X": -45, "Y": 92, "Z": 5},
+            "FirstKeyLocation": {"X": -25, "Y": -58, "Z": -45},
+            "NumberOfKeys": 2,
+            "KeySpacing": 24,
+            "RowType": 3
+        }
+    ]
+}

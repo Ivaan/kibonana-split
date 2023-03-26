@@ -7,16 +7,16 @@ import (
 )
 
 type Column struct { // a column of keys for a single finger
-	offset       sdf.V3
-	splayAngle   float64
-	convexAngle  float64
-	numberOfKeys int
-	startAngle   float64
-	startRadius  float64
-	endAngle     float64
-	endRadius    float64
-	keySpacing   float64
-	columnType   ColumnType
+	Offset       sdf.V3
+	SplayAngle   float64
+	ConvexAngle  float64
+	NumberOfKeys int
+	StartAngle   float64
+	StartRadius  float64
+	EndAngle     float64
+	EndRadius    float64
+	KeySpacing   float64
+	ColumnType   ColumnType
 }
 
 type ColumnType int
@@ -31,16 +31,16 @@ const (
 )
 
 type ConeRow struct { //a row of keys in the thumb cluster deffined as a path along a cone (the code described by the movement of the thumb where the end of the thumb closest to the wrist is the point of the cone)
-	offsetToPoint sdf.V3
-	centerLine    sdf.V3 //vector down the middle of this cone
+	OffsetToPoint sdf.V3
+	CenterLine    sdf.V3 //vector down the middle of this cone
 	//distance float64 //from the point to the center of the keys (height from the cone perspective)
 	//radius float64 //from the centerLine out to the keys
 	//and angle somehow ...
 	//or maybe we just define
-	firstKeyLocation sdf.V3 //and compute radius and distance from that
-	numberOfKeys     int
-	keySpacing       float64
-	rowType          RowType
+	FirstKeyLocation sdf.V3 //and compute radius and distance from that
+	NumberOfKeys     int
+	KeySpacing       float64
+	RowType          RowType
 }
 
 type RowType int
@@ -83,10 +83,10 @@ type NoduleSource interface {
 // 12 08 09
 
 func (col Column) getKeyLocations() []NoduleTypeAndPoint {
-	points := spacedPointsOnAnArc(sdf.DtoR(col.startAngle), col.startRadius, sdf.DtoR(col.endAngle), col.endRadius, col.keySpacing, col.numberOfKeys)
+	points := spacedPointsOnAnArc(sdf.DtoR(col.StartAngle), col.StartRadius, sdf.DtoR(col.EndAngle), col.EndRadius, col.KeySpacing, col.NumberOfKeys)
 	places := make([]NoduleTypeAndPoint, len(points))
 	var firstType, middleType, lastType int64
-	switch col.columnType {
+	switch col.ColumnType {
 	case LeftColumn:
 		firstType = 6
 		middleType = 4
@@ -101,10 +101,10 @@ func (col Column) getKeyLocations() []NoduleTypeAndPoint {
 		lastType = 9
 	}
 	for i, p := range points {
-		places[i].moveTo = sdf.Translate3d(col.offset).Mul( //offset column per knucle possition
-			sdf.RotateZ(sdf.DtoR(-col.splayAngle)), //rotate column for finger splay
+		places[i].moveTo = sdf.Translate3d(col.Offset).Mul( //offset column per knucle possition
+			sdf.RotateZ(sdf.DtoR(-col.SplayAngle)), //rotate column for finger splay
 		).Mul(
-			sdf.RotateY(sdf.DtoR(col.convexAngle)), //rotate column for row convex curve
+			sdf.RotateY(sdf.DtoR(col.ConvexAngle)), //rotate column for row convex curve
 		).Mul(
 			sdf.Translate3d(sdf.V3{X: 0, Y: p.location.Y, Z: -p.location.X}), //position key on sweap of column
 		).Mul(
@@ -209,13 +209,13 @@ func (con ConeRow) getKeyLocations() []NoduleTypeAndPoint {
 
 	*/
 
-	toOrigin := sdf.Translate3d(con.offsetToPoint.Neg()) //translate offsetpoint to origin
+	toOrigin := sdf.Translate3d(con.OffsetToPoint.Neg()) //translate offsetpoint to origin
 	//fmt.Println("rotateToXZPlane:", sdf.RtoD(-math.Atan2(con.centerLine.Y, con.centerLine.X)))
-	rotateToXZPlane := sdf.RotateZ(-math.Atan2(con.centerLine.Y, con.centerLine.X))     //rotate cone centerline about Z axis to XZ plane (i.e. the Y = zero plane)
-	rotatedCenterLine := rotateToXZPlane.MulPosition(con.centerLine)                    //centerline after rotation to XZ plane
+	rotateToXZPlane := sdf.RotateZ(-math.Atan2(con.CenterLine.Y, con.CenterLine.X))     //rotate cone centerline about Z axis to XZ plane (i.e. the Y = zero plane)
+	rotatedCenterLine := rotateToXZPlane.MulPosition(con.CenterLine)                    //centerline after rotation to XZ plane
 	rotateToZAxis := sdf.RotateY(-math.Atan2(rotatedCenterLine.X, rotatedCenterLine.Z)) //rotate cone centerline about Y axis to Z axis (i.e. the now X also = zero)
 
-	movedFirstKeyLocation := rotateToZAxis.Mul(rotateToXZPlane).Mul(toOrigin).MulPosition(con.firstKeyLocation) //location of the first key relative to the cone center vector after being moved to the Z axis
+	movedFirstKeyLocation := rotateToZAxis.Mul(rotateToXZPlane).Mul(toOrigin).MulPosition(con.FirstKeyLocation) //location of the first key relative to the cone center vector after being moved to the Z axis
 	rotateFirstKeyToX := sdf.RotateZ(-math.Atan2(movedFirstKeyLocation.Y, movedFirstKeyLocation.X))             //rotate the moved First Key to the XZ plane
 	firstKeyOnXZ := rotateFirstKeyToX.MulPosition(movedFirstKeyLocation)                                        //first key rotated to X axis relative to cone on Z axis
 
@@ -223,16 +223,16 @@ func (con ConeRow) getKeyLocations() []NoduleTypeAndPoint {
 	moveUpCone := sdf.Translate3d(sdf.V3{Z: firstKeyOnXZ.Length()})
 	leanKeyOut := sdf.RotateY(math.Atan2(firstKeyOnXZ.X, firstKeyOnXZ.Z)) //rotation to lean a key on Z axis out to inner surface of cone at first key location
 
-	rotateAnglePerKey := math.Atan2(con.keySpacing, firstKeyOnXZ.X) //if the keys are on the surface of a cone at a certain height, then the first key Z is that height, and the first key X is the distance from the center. The keys will describe a circle at radius X.
+	rotateAnglePerKey := math.Atan2(con.KeySpacing, firstKeyOnXZ.X) //if the keys are on the surface of a cone at a certain height, then the first key Z is that height, and the first key X is the distance from the center. The keys will describe a circle at radius X.
 
 	putTheConeBack := toOrigin.Inverse().Mul(rotateToXZPlane.Inverse()).Mul(rotateToZAxis.Inverse().Mul(rotateFirstKeyToX.Inverse())) //reverse the transformation that brought the cone centerline to the Z axis
 
-	places := make([]NoduleTypeAndPoint, con.numberOfKeys)
+	places := make([]NoduleTypeAndPoint, con.NumberOfKeys)
 	// 06 02 03
 	// 04 00 01
 	// 12 08 09
 	var firstType, middleType, lastType int64
-	switch con.rowType {
+	switch con.RowType {
 	case TopRow:
 		firstType = 6
 		middleType = 2
@@ -250,7 +250,7 @@ func (con ConeRow) getKeyLocations() []NoduleTypeAndPoint {
 		middleType = 10
 		lastType = 11
 	}
-	for i := 0; i < con.numberOfKeys; i++ {
+	for i := 0; i < con.NumberOfKeys; i++ {
 		places[i] = NoduleTypeAndPoint{
 			moveTo:              putTheConeBack.Mul(sdf.RotateZ(float64(i) * rotateAnglePerKey)).Mul(leanKeyOut).Mul(moveUpCone).Mul(rotateKeyToZ),
 			screwPossitionsBits: 10, //TODO: compute screw possitions by rowType

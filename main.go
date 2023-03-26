@@ -1,103 +1,23 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/titanous/json5"
+	"os"
 
 	"github.com/deadsy/sdfx/render"
 	"github.com/deadsy/sdfx/sdf"
 )
 
 func main() {
-	kd := keyboardDefinition{
-		BubbleKeyNodulePropertiesFile: "BubbleKeyNoduleProperties.json",
-		FingerColumns: []Column{
-			{ //H
-				offset:       sdf.V3{X: -19.1},
-				splayAngle:   0,
-				convexAngle:  0,
-				numberOfKeys: 3,
-				startAngle:   -20,
-				startRadius:  60,
-				endAngle:     75,
-				endRadius:    85,
-				keySpacing:   19.4,
-				columnType:   LeftColumn,
-			},
-			{ //J
-				offset:       sdf.V3{},
-				splayAngle:   0,
-				convexAngle:  0,
-				numberOfKeys: 3,
-				startAngle:   -20,
-				startRadius:  60,
-				endAngle:     75,
-				endRadius:    85,
-				keySpacing:   19.4,
-				columnType:   MiddleColumn,
-			},
-			{ //K
-				offset:       sdf.V3{X: 23},
-				splayAngle:   5,
-				convexAngle:  .5,
-				numberOfKeys: 3,
-				startAngle:   -20,
-				startRadius:  65,
-				endAngle:     75,
-				endRadius:    95,
-				keySpacing:   19.4,
-				columnType:   MiddleColumn,
-			},
-			{ //L
-				offset:       sdf.V3{X: 47},
-				splayAngle:   10,
-				convexAngle:  1,
-				numberOfKeys: 3,
-				startAngle:   -20,
-				startRadius:  62.5,
-				endAngle:     75,
-				endRadius:    90,
-				keySpacing:   19.4,
-				columnType:   MiddleColumn,
-			},
-			{ //;
-				offset:       sdf.V3{X: 77, Y: -4},
-				splayAngle:   25,
-				convexAngle:  3,
-				numberOfKeys: 3,
-				startAngle:   -20,
-				startRadius:  55,
-				endAngle:     75,
-				endRadius:    70,
-				keySpacing:   19.4,
-				columnType:   MiddleColumn,
-			},
-		},
-		// Column{ //'
-		// 	offset:       sdf.V3{X: 94.28675532291557, Y: -12.060946391727217, Z: -0.9996167642402273},
-		// 	splayAngle:   25,
-		// 	convexAngle:  3,
-		// 	numberOfKeys: 4,
-		// 	startAngle:   -20,
-		// 	startRadius:  55,
-		// 	endAngle:     75,
-		// 	endRadius:    70,
-		// 	keySpacing:   19.4,
-		// 	columnType:   RightColumn,
-		// },
 
-		ThumbRows: []ConeRow{
-			{
-				offsetToPoint:    sdf.V3{X: -20, Y: -132, Z: -24},
-				centerLine:       sdf.V3{X: -45, Y: 92, Z: 5},
-				firstKeyLocation: sdf.V3{X: -25, Y: -58, Z: -45},
-				rowType:          OnlyRow,
-				numberOfKeys:     2,
-				keySpacing:       24,
-			},
-		},
+	var kd KeyboardDefinition
+	kdBytes, err := os.ReadFile("keyboard-right-def.json")
+	if err != nil {
+		panic(err)
+	}
+	err = json5.Unmarshal(kdBytes, &kd)
+	if err != nil {
+		panic(err)
 	}
 
 	var knp BubbleKeyNoduleProperties
@@ -110,55 +30,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	a := sdf.V3{X: 19.1}
-	a = sdf.RotateZ(sdf.DtoR(-25)).Mul(sdf.RotateY(sdf.DtoR(3))).MulPosition(a)
-	b := sdf.V3{X: 77, Y: -4}
-
-	fmt.Println(b.Add(a))
-
-	// //dual key
-	// cols = []Column{
-	// 	{ //H
-	// 		offset:       sdf.V3{X: -19.1},
-	// 		splayAngle:   0,
-	// 		convexAngle:  0,
-	// 		numberOfKeys: 2,
-	// 		startAngle:   0,
-	// 		startRadius:  60,
-	// 		endAngle:     95,
-	// 		endRadius:    85,
-	// 		keySpacing:   19.1,
-	// 	},
-	// }
-
-	// //single key
-	// cols = []Column{
-	// 	{
-	// 		offset:       sdf.V3{},
-	// 		splayAngle:   0,
-	// 		convexAngle:  0,
-	// 		numberOfKeys: 1,
-	// 		startAngle:   0,
-	// 		startRadius:  60,
-	// 		endAngle:     95,
-	// 		endRadius:    85,
-	// 		keySpacing:   19.1,
-	// 	},
-	// }
-
-	// points := col1.getKeyLocations()
-	// points = append(points, col2.getKeyLocations()...)
-	// nodes := make([]Nodule, len(points))
-
-	// var err error
-	// for i, p := range points {
-	// 	nodes[i], err = knp.MakeBubbleKey(p)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-
-	// }
 
 	points := make([]NoduleTypeAndPoint, 0)
 	for _, col := range kd.FingerColumns {
@@ -201,48 +72,13 @@ func main() {
 	top := NoduleCollection(topNodules).Combine()
 	back := sdf.Difference3D(NoduleCollection(bottomNodules).Combine(), top)
 
-	// s1, _ := sdf.Sphere3D(2)
-	// s2, _ := sdf.Sphere3D(5)
-	// c, _ := sdf.Cylinder3D(5, 5, 0)
-	// r := cols[len(cols)-1].(ConeRow)
-
-	// topDebug := make([]sdf.SDF3, 0)
-	// topDebug = append(topDebug,
-	// 	top,
-	// 	sdf.Transform3D(s1, sdf.Translate3d(r.offsetToPoint)),
-	// 	sdf.Transform3D(s2, sdf.Translate3d(r.offsetToPoint.Add(r.centerLine))),
-	// 	sdf.Transform3D(c, sdf.Translate3d(r.firstKeyLocation)),
-	// )
-
-	// _, debugLocations := r.getKeyLocationsWithExtras()
-
-	// for _, v := range debugLocations {
-	// 	topDebug = append(topDebug, sdf.Transform3D(s1, sdf.Translate3d(v)))
-	// }
-
-	// topPlus := sdf.Union3D(topDebug...)
 	_ = top
 	_ = back
-	//render.RenderSTLSlow(sdf.Intersect3D(top, back), 300, "overlap.stl")
-	render.RenderSTLSlow(top, 350, "top.stl")
-	render.RenderSTLSlow(back, 300, "back.stl")
 
-	// render.RenderSTL(top, 350, "3x5plus2top.stl")
-	// render.RenderSTL(back, 300, "3x5plus2back.stl")
+	render.RenderSTL(top, 350, "3x5plus2top.stl")
+	render.RenderSTL(back, 300, "3x5plus2back.stl")
 	//render.RenderSTL(top, 300, "3x5plus2top.stl")
 	//render.RenderSTL(back, 300, "3x5plus2back.stl")
-
-	//testing RowCones
-	// row := ConeRow{
-	// 	offsetToPoint:    sdf.V3{X: -20, Y: -40, Z: -14},
-	// 	centerLine:       sdf.V3{X: -5, Y: 15, Z: 5},
-	// 	firstKeyLocation: sdf.V3{X: -20, Y: 15, Z: -25},
-	// 	rowType:          OnlyRow,
-	// 	numberOfKeys:     4,
-	// 	keySpacing:       20,
-	// }
-
-	// render.RenderSTL(row.getKeyLocations(), 300, "testCone.stl")
 
 }
 
@@ -272,27 +108,4 @@ y2 = (startRadius + radiusPerAngleIncrement*(angle-startAngle)) * SIN(angle)
 
 distance = SQRT( ((startRadius + radiusPerAngleIncrement*(angle-startAngle)) * COS(angle)-x)^2 + ((startRadius + radiusPerAngleIncrement*(angle-startAngle)) * SIN(angle)-y)^2 )
 
-*/
-
-/*
-knp := FlatterKeyNoduleProperties{
-	sphereRadius:             20.0,
-	sphereCut:                7,
-	plateThickness:           12,
-	sphereThicknes:           3,
-	backCoverLipCut:          2,
-	switchHoleLength:         14,
-	switchHoleWidth:          14,
-	switchHoleDepth:          3.5,
-	switchLatchWidth:         4,
-	switchLatchGrabThickness: 1.5,
-	switchFlatzoneLength:     16,
-	switchFlatzoneWidth:      15,
-	pcbLength:                17,
-	pcbWidth:                 17,
-	keycapWidth:              18.5,
-	keycapHeight:             18.6,
-	keycapRound:              2,
-	keycapOffset:             7.2,
-}
 */

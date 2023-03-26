@@ -1,6 +1,6 @@
 package main
 
-type keyboardDefinition struct {
+type KeyboardDefinition struct {
 	BubbleKeyNodulePropertiesFile string
 	FingerColumns                 []Column
 	ThumbRows                     []ConeRow
