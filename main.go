@@ -6,81 +6,74 @@ import (
 
 	"github.com/titanous/json5"
 
+	"github.com/deadsy/sdfx/render"
 	"github.com/deadsy/sdfx/sdf"
 )
 
 func main() {
-	var knp BubbleKeyNoduleProperties
-	knpBytes, err := os.ReadFile("BubbleKeyNoduleProperties.json")
-	if err != nil {
-		panic(err)
-	}
-
-	err = json5.Unmarshal(knpBytes, &knp)
-	if err != nil {
-		panic(err)
-	}
-
-	cols := []NoduleSource{
-		Column{ //H
-			offset:       sdf.V3{X: -19.1},
-			splayAngle:   0,
-			convexAngle:  0,
-			numberOfKeys: 3,
-			startAngle:   -20,
-			startRadius:  60,
-			endAngle:     75,
-			endRadius:    85,
-			keySpacing:   19.4,
-			columnType:   LeftColumn,
-		},
-		Column{ //J
-			offset:       sdf.V3{},
-			splayAngle:   0,
-			convexAngle:  0,
-			numberOfKeys: 3,
-			startAngle:   -20,
-			startRadius:  60,
-			endAngle:     75,
-			endRadius:    85,
-			keySpacing:   19.4,
-			columnType:   MiddleColumn,
-		},
-		Column{ //K
-			offset:       sdf.V3{X: 23},
-			splayAngle:   5,
-			convexAngle:  .5,
-			numberOfKeys: 3,
-			startAngle:   -20,
-			startRadius:  65,
-			endAngle:     75,
-			endRadius:    95,
-			keySpacing:   19.4,
-			columnType:   MiddleColumn,
-		},
-		Column{ //L
-			offset:       sdf.V3{X: 47},
-			splayAngle:   10,
-			convexAngle:  1,
-			numberOfKeys: 3,
-			startAngle:   -20,
-			startRadius:  62.5,
-			endAngle:     75,
-			endRadius:    90,
-			keySpacing:   19.4,
-			columnType:   MiddleColumn,
-		},
-		Column{ //;
-			offset:       sdf.V3{X: 77, Y: -4},
-			splayAngle:   25,
-			convexAngle:  3,
-			numberOfKeys: 3,
-			startAngle:   -20,
-			startRadius:  55,
-			endAngle:     75,
-			endRadius:    70,
-			keySpacing:   19.4,
-			columnType:   MiddleColumn,
+	kd := keyboardDefinition{
+		BubbleKeyNodulePropertiesFile: "BubbleKeyNoduleProperties.json",
+		FingerColumns: []Column{
+			{ //H
+				offset:       sdf.V3{X: -19.1},
+				splayAngle:   0,
+				convexAngle:  0,
+				numberOfKeys: 3,
+				startAngle:   -20,
+				startRadius:  60,
+				endAngle:     75,
+				endRadius:    85,
+				keySpacing:   19.4,
+				columnType:   LeftColumn,
+			},
+			{ //J
+				offset:       sdf.V3{},
+				splayAngle:   0,
+				convexAngle:  0,
+				numberOfKeys: 3,
+				startAngle:   -20,
+				startRadius:  60,
+				endAngle:     75,
+				endRadius:    85,
+				keySpacing:   19.4,
+				columnType:   MiddleColumn,
+			},
+			{ //K
+				offset:       sdf.V3{X: 23},
+				splayAngle:   5,
+				convexAngle:  .5,
+				numberOfKeys: 3,
+				startAngle:   -20,
+				startRadius:  65,
+				endAngle:     75,
+				endRadius:    95,
+				keySpacing:   19.4,
+				columnType:   MiddleColumn,
+			},
+			{ //L
+				offset:       sdf.V3{X: 47},
+				splayAngle:   10,
+				convexAngle:  1,
+				numberOfKeys: 3,
+				startAngle:   -20,
+				startRadius:  62.5,
+				endAngle:     75,
+				endRadius:    90,
+				keySpacing:   19.4,
+				columnType:   MiddleColumn,
+			},
+			{ //;
+				offset:       sdf.V3{X: 77, Y: -4},
+				splayAngle:   25,
+				convexAngle:  3,
+				numberOfKeys: 3,
+				startAngle:   -20,
+				startRadius:  55,
+				endAngle:     75,
+				endRadius:    70,
+				keySpacing:   19.4,
+				columnType:   MiddleColumn,
+			},
 		},
 		// Column{ //'
 		// 	offset:       sdf.V3{X: 94.28675532291557, Y: -12.060946391727217, Z: -0.9996167642402273},
@@ -94,14 +87,28 @@ func main() {
 		// 	keySpacing:   19.4,
 		// 	columnType:   RightColumn,
 		// },
-		ConeRow{
-			offsetToPoint:    sdf.V3{X: -20, Y: -132, Z: -24},
-			centerLine:       sdf.V3{X: -45, Y: 92, Z: 5},
-			firstKeyLocation: sdf.V3{X: -25, Y: -58, Z: -45},
-			rowType:          OnlyRow,
-			numberOfKeys:     2,
-			keySpacing:       24,
+
+		ThumbRows: []ConeRow{
+			{
+				offsetToPoint:    sdf.V3{X: -20, Y: -132, Z: -24},
+				centerLine:       sdf.V3{X: -45, Y: 92, Z: 5},
+				firstKeyLocation: sdf.V3{X: -25, Y: -58, Z: -45},
+				rowType:          OnlyRow,
+				numberOfKeys:     2,
+				keySpacing:       24,
+			},
 		},
+	}
+
+	var knp BubbleKeyNoduleProperties
+	knpBytes, err := os.ReadFile(kd.BubbleKeyNodulePropertiesFile)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json5.Unmarshal(knpBytes, &knp)
+	if err != nil {
+		panic(err)
 	}
 
 	a := sdf.V3{X: 19.1}
@@ -154,8 +161,12 @@ func main() {
 	// }
 
 	points := make([]NoduleTypeAndPoint, 0)
-	for _, col := range cols {
+	for _, col := range kd.FingerColumns {
 		points = append(points, col.getKeyLocations()...)
+	}
+
+	for _, row := range kd.ThumbRows {
+		points = append(points, row.getKeyLocations()...)
 	}
 
 	topNodules := make([]Nodule, len(points))
@@ -213,8 +224,8 @@ func main() {
 	_ = top
 	_ = back
 	//render.RenderSTLSlow(sdf.Intersect3D(top, back), 300, "overlap.stl")
-	// render.RenderSTLSlow(top, 350, "top.stl")
-	// render.RenderSTLSlow(back, 300, "back.stl")
+	render.RenderSTLSlow(top, 350, "top.stl")
+	render.RenderSTLSlow(back, 300, "back.stl")
 
 	// render.RenderSTL(top, 350, "3x5plus2top.stl")
 	// render.RenderSTL(back, 300, "3x5plus2back.stl")

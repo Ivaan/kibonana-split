@@ -1,6 +1,8 @@
 [x] - move Nodule properties to be read from a json file
 [ ] - move keyboard properties to be read from a json file
-	[ ] - this means solving the polymorphism problem
+	[-] - this means solving the polymorphism problem
+	* - or it means choosing not to have that problem
+	[x] - craft a type to hold columns, thumb rows, and the rest of a keyboard definition
 [ ] - fix thumb cluster location
 	[ ] - probably just move it up (y) a full key width
 [ ] - fix pinkey column position
