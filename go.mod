@@ -1,4 +1,4 @@
-module shapes/ParametricKeyboard/NoduleExperimentation
+module kibonana-split
 
 go 1.18
 

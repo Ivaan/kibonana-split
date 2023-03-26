@@ -4,7 +4,7 @@
 	* - or it means choosing not to have that problem
 	[x] - craft a type to hold columns, thumb rows, and the rest of a keyboard definition
 [ ] - Name output files per keyboard def filename
-[ ] - correct compiled binary file name
+[x] - correct compiled binary file name
 [ ] - fix thumb cluster location
 	[ ] - probably just move it up (y) a full key width
 [ ] - fix pinkey column position
