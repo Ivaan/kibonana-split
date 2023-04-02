@@ -1,17 +1,21 @@
 package main
 
 import (
-	"github.com/titanous/json5"
+	"flag"
 	"os"
+	"strings"
 
 	"github.com/deadsy/sdfx/render"
 	"github.com/deadsy/sdfx/sdf"
+	"github.com/titanous/json5"
 )
 
 func main() {
+	keyboardDefFilename := flag.String("keyboardDef", "keyboard-right-def.json", "Filename for the keyboard deffinition to load and generate")
+	flag.Parse()
 
 	var kd KeyboardDefinition
-	kdBytes, err := os.ReadFile("keyboard-right-def.json")
+	kdBytes, err := os.ReadFile(*keyboardDefFilename)
 	if err != nil {
 		panic(err)
 	}
@@ -75,8 +79,10 @@ func main() {
 	_ = top
 	_ = back
 
-	render.RenderSTL(top, 350, "3x5plus2top.stl")
-	render.RenderSTL(back, 300, "3x5plus2back.stl")
+	topOutputFileName := strings.TrimSuffix(*keyboardDefFilename, ".json") + "top.stl"
+	backOutputFileName := strings.TrimSuffix(*keyboardDefFilename, ".json") + "back.stl"
+	render.RenderSTL(top, 350, topOutputFileName)
+	render.RenderSTL(back, 300, backOutputFileName)
 	//render.RenderSTL(top, 300, "3x5plus2top.stl")
 	//render.RenderSTL(back, 300, "3x5plus2back.stl")
 
